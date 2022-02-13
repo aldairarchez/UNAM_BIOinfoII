@@ -1,0 +1,215 @@
+---
+title: "homework_01"
+author: "Esteban Jorquera"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+  css: readable.min.css
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Practical: BAM file
+
+```{code}
+
+# opens a qlogin session 
+qlogin
+
+# copies the NA20538.bam file from its parent directory to a local work directory
+cp /mnt/Timina/bioinfoII/data/format_qc/NA20538.bam /mnt/Citosina/amedina/ejorquera/BioInfoII/
+
+# checks module availability   
+module avail
+
+# loads a version (1.9) of the required program samtools, available from the module list
+module load samtools/1.9
+
+# displays samtools view options
+samtools view -man
+
+# loads the bam file and print only the header
+samtools view -H NA20538.bam | less -S
+```
+
+# What does RG stand for?
+
+RG stands for read group
+
+
+#  What is the lane ID? ("Lane" is the basic independent run of a high- throughput sequencing machine. For Illumina machines, this is the physical sequencing lane. Reads from one lane are identified by the same read group ID and the information about lanes can be found in the header in lines starting with "@RG".)
+
+The lane ID is referenced by the "ID" tag
+
+
+# What is the sequencing platform?
+
+The sequencing platform is referenced by the "PL" tag, according to this, the used platform was Illumina
+
+
+# What version of the human assembly was used to perform the alignments?
+
+Found at the @SQ lines (Reference sequence dictionary), referenced in the "AS" tag (NCBI37) and in the "UR" tag (<ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz>), according to them, the reference genome assembly used corresponds to GRCh37 (Genome Reference Consortium Human Build 37), specifically the one downloaded from the 1000 Genomes Project
+
+
+# What programs were used to create this BAM file?
+
+Found at each @PG line, referenced in the "ID" tags (program name) and "VN" tags (version number), the used programs corresponded to: -Genome Analysis Toolkit (GATK) - IndelRealigner version 1.0.4487 -Genome Analysis Toolkit (GATK) - TableRecalibration version 1.0.4487 -Burrows-Wheeler Aligner (bwa) version 0.5.5
+
+
+# What version of bwa was used to align the reads?
+
+As mentioned before, the used version of bwa corresponds to version 0.5.5, as mentioned in its "VN" tag
+
+
+# What is the name of the first read?
+
+```{code}
+# loads the bam file and also prints the header
+samtools view -h NA20538.bam | less -S
+```
+
+As shown in the first line that does not correspond to the header, the first read is named ERR003814.1408899
+
+
+# What position does the alignment of the read start at?
+
+The read ERR003814.1408899 starts at position 19999970 as it is shown in the fourth column (POS)
+
+
+# What is the mapping quality of the first read?
+
+The mapping quality of the read ERR003814.1408899 corresponds to 23, as it is shown in the fifth column (MAPQ)
+
+
+
+##Practical bcf
+
+
+# What is a bcf?
+
+A bcf file is the binary variant of a vcf file (Variant Call Format), which in itself is a text file format for the storage of gene sequence variations, therefore a bcf is a Binary variant calling format
+
+# Can you convert bcf to vcf using bcftools? How?
+
+Yes, by executing the following code
+
+```{code}
+# copies the 1kg.bcf file, and its index file from their parent directory to a local work directory
+cp /mnt/Timina/bioinfoII/data/format_qc/1kg.bcf /mnt/Citosina/amedina/ejorquera/BioInfoII/
+cp /mnt/Timina/bioinfoII/data/format_qc/1kg.bcf.csi /mnt/Citosina/amedina/ejorquera/BioInfoII/
+
+# checks module availability 
+module avail
+
+# loads a version (1.10.2) of the required program bcftools, available from the module list
+module load bcftools/1.10.2
+
+# loads the bcf file and saves it as a vcf file
+bcftools view /mnt/Citosina/amedina/ejorquera/BioInfoII/1kg.bcf > 1kg.vcf
+```
+
+Using the view command will load the binary file by bcftools, then saving it as a vcf file will make it human readable
+
+
+# How many samples are in the BCF? Hint: use the -l option.
+
+```{code}
+# asks the bcf file for the sample list and counts the lines present
+bcftools query -l /mnt/Citosina/amedina/ejorquera/BioInfoII/1kg.bcf | wc -l
+```
+
+query extracts fields from either the vcf or bcf file. The -l option makes query output the list of samples in the file, piping the previous with "wc -l" makes it count the number of lines in the output. 
+
+So therefore, there are 50 samples in the file
+
+
+# What is the genotype of the sample HG00107 at the position 20:24019472? Hint: use the combination of -r, -s, and -f '[ %TGT]\n' options.
+
+```{code}
+# shows the data contained in the bcf file for the HG00107 sample at the chromosome 20 position 24019472
+bcftools view -r 20:24019472 -s HG00107 -f '[ %TGT]\n' /mnt/Citosina/amedina/ejorquera/BioInfoII/1kg.bcf
+```
+
+At the position 20:24019472, the sample HG00107 has a heterozygous phenotype as indicated by the "0/1" data of the "GT" tag, we can't be sure in which chromosome is located the reference (A) or alternative (T) alleles due to the use of the "/" symbol instead of "|"
+
+```{r just the table generated by the previous code}
+table <- matrix(c('20','24019472','.','A','T','999','.','AN=2;AC=1;AC_Het=16;AC_Hom=2;AC_Hemi=0','GT:PL:DP','0/1:235;0;148:16'), ncol=10, byrow=TRUE)
+colnames(table) <- c('#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','HG00107')
+table_k <- as.data.frame(table)
+kable(table_k,align = "c")
+```
+
+
+# How many positions there are with more than 10 alternate alleles? (See the INFO/AC tag.) Hint: use the -i filtering option.
+
+```{code}
+# asks the bcf file for any position with more than 10 alternate alleles and counts the lines present
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%SAMPLE=%GT]\n' -i 'AC>10' /mnt/Citosina/amedina/ejorquera/BioInfoII/1kg.bcf | wc -l
+```
+
+query shows the data contained in the bcf file in the -f '#', format -f '%CHROM\t%POS\t%REF\t%ALT[\t%SAMPLE=%GT]\n' set the format of the query output to chromosome, position, reference allele, alternative allele, and the sample's genotype, -i 'AC>10' sets a filter to only display the lines with an "AC" value bigger than 10, piping the previous with "wc -l" makes it count the number of lines in the output.
+
+So therefore, there are 4778 positions with more than 10 alternate alleles
+
+
+# List all positions where HG00107 has a non-reference genotype and the read depth is bigger than 10.
+
+```{code}
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%SAMPLE=%GT]\n' -s HG00107 -i 'DP>10 && GT="ref"' /mnt/Citosina/amedina/ejorquera/BioInfoII/1kg.bcf | wc -l
+```
+
+query shows the data contained in the bcf file in the -f '#' format, -f '%CHROM\t%POS\t%REF\t%ALT[\t%SAMPLE=%GT]\n' set the format of the query output to chromosome, position, reference allele, alternative allele, and the sample's genotype, -s HG00107 set the samples to be evaluated to only HG00107, -i 'DP>10 && GT="alt"' sets a filter to only display the lines with a depth ("DP") bigger than 10 and where the genotype ("GT") is not equal to the reference, piping the previous with "wc -l" makes it count the number of lines in the output.
+
+So therefore, there are 451 positions where the sample HG00107 has a non-reference genotype and the read depth is bigger than 10.
+
+
+
+##Practical stats
+
+
+# Using samtools stats answer
+
+```{code}
+# displays samtools stats options
+samtools stats -man
+```
+
+# What is the total number of reads?
+
+```{code}
+# displays samtools stats options
+samtools stats -man
+
+# shows stats for the NA20538.bam file and uses grep and cut to only show the summary numbers
+samtools stats NA20538.bam | grep ^SN | cut -f 2-
+```
+
+
+# What proportion of the reads were mapped?
+
+```{r}
+# total reads results of previous code
+reads_raw <- 347367
+# total mapped reads results of previous code
+reads_mapped <- 323966
+# percent of the total reads that were mapped
+reads_percent = reads_mapped*100/reads_raw
+```
+
+The portion of reads that were mapped corresponds to `r round(reads_percent, digits = 1)`%
+
+
+# How many reads were mapped to a different chromosome?
+
+According to the summary data of the NA20538.bam file, 4055 reads had pairs on different chromosomes
+
+
+# What is the insert size mean and standard deviation?
+
+According to the summary data of the NA20538.bam file, the mean insert size was 190.3, and its standard deviation: 136.4
+
