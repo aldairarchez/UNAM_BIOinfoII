@@ -57,17 +57,13 @@ module load samtools/1.9
 samtools view -H /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sam | less -S
 ```
 
+mm10 reference genome: /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa
 
-mm10 reference genome:
-/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa
-
-mm10 index files:
-/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.amb  
-/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.ann  
-/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.bwt  
-/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.pac  
+mm10 index files: /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.amb\
+/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.ann\
+/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.bwt\
+/mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.pac\
 /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.sa
-
 
 ```{code}
 bwa aln /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sai
@@ -75,13 +71,12 @@ bwa aln /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_M
 bwa samse /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sai /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sam
 ```
 
-
-
-
 ```{code}
 samtools view -H /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_FNR_ChIP.sam | less -S
 ```
+
 Generation of a sge script because of the huge amount of sequences our RAM memory wasn't enough
+
 ```{code MMusculus.sge}
 #!/bin/bash
 # Use current working directory
@@ -120,3 +115,4 @@ samtools stats MMusculus_FNR_ChIP.sam > MMusculus_FNR_ChIP.stats
 nano  MMusculus_FNR_ChIP.stats
 ```
 
+![image insertion test](%5Chomework_02%5CCEBPA%5Cduplication_levels.png)
