@@ -1,0 +1,44 @@
+---
+title: "homework_02"
+author: "Esteban Jorquera"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+  css: readable.min.css
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Practical: Alignment
+
+```{code}
+
+# copies all files from its parent directory to a local work directory
+cp /mnt/Timina/bioinfoII/data/alignment/* /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2
+
+# opens a qlogin session
+qlogin
+
+# checks module availability 
+module avail
+
+# loads a version (0.7.15) of the required program bwa, available from the module list
+module load bwa/0.7.15
+
+# indexes the Escherichia_coli_K12_MG1655.fasta file using bwa
+bwa index /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta
+
+# loads a version (0.11.3) of the required program fastqc, available from the module list
+module load fastqc/0.11.3
+
+#  
+fastqc -h
+
+fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq -o output
+
+scp ejorquera@dna.lavis.unam.mx:/mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/* /home/esteban/Tarea_2_Results
+```
