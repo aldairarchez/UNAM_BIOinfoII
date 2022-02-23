@@ -44,8 +44,10 @@ scp ejorquera@dna.lavis.unam.mx:/mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_
 ```
 
 ```{code}
+#alignment of the Escherichia coli genome reference with the Chip-seq identifier SRX189773
 bwa aln /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sai
 
+#convertion of the sam file of the alignment, so we could open samtools stats
 bwa samse /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sai /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sam
 ```
 
@@ -74,16 +76,47 @@ bwa samse /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12
 ```
 
 
-```{code}
-bwa aln /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_FNR_ChIP.sai
 
-bwa samse /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_FNR_ChIP.sai /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_FNR_ChIP.sam
-
-
-bwa samse mm10.fa MMusculus_FNR_ChIP.sai SRX189773_FNR_ChIP.fastq > MMusculus_FNR_ChIP.sam
-```
 
 ```{code}
 samtools view -H /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_FNR_ChIP.sam | less -S
+```
+Generation of a sge script because of the huge amount of sequences our RAM memory wasn't enough
+```{code MMusculus.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+#You can edit the scriptsince this line
+#
+# Your job name
+#$ -N Marlon_job
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M aldarchez26@gmail.com
+#
+# If modules are needed, source modules environment (Do not delete the next line):
+. /etc/profile.d/modules.sh
+#
+# Add any modules you might require
+(module load bwa/0.7.15 ; bwa mem -M -t 8 /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa /mnt/Timina/bioinfoII/data/alignment/mus_musculus_CEBPA_liver_ERR005132.fastq.gz > /mnt/Timina/bioinfoII/marciniega/tarea_02/MMusculus_FNR_ChIP.sam)
+```
+
+```{code}
+#run of the sge archive to generate our file of interest (sam)
+qsub MMusculus.sge
+
+#generation of the samtools stats archive
+samtools stats MMusculus_FNR_ChIP.sam > MMusculus_FNR_ChIP.stats
+
+#we open the stats file as follows
+nano  MMusculus_FNR_ChIP.stats
 ```
 
