@@ -35,11 +35,12 @@ bwa index /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12
 # loads a version (0.11.3) of the required program fastqc, available from the module list
 module load fastqc/0.11.3
 
-#  
+# manual of the fastqc module 
 fastqc -h
-
+#generation of the fastq format from the transcriptional activator FNR from E. coli
 fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq -o output
 
+#the last stpe generates html and zip archives, which we saved on our computers to visualize them
 scp ejorquera@dna.lavis.unam.mx:/mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/* /home/esteban/Tarea_2_Results
 ```
 
@@ -54,8 +55,19 @@ bwa samse /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12
 ```{code}
 module load samtools/1.9
 
-samtools view -H /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sam | less -S
+samtools stats /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sam 
 ```
+
+
+## MMusculus
+
+
+**generates html and zip archives, which we saved on our computers to visualize them
+fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq -o output 
+scp ejorquera@dna.lavis.unam.mx:/mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/* /home/esteban/Tarea_2_Results **
+
+
+There are already the refrence genome and index files, so we just need their respective directories:
 
 mm10 reference genome: /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa
 
@@ -65,15 +77,6 @@ mm10 index files: /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm
 /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.pac\
 /mnt/Archives/genome/mouse/mm10/UCSC/bwa-0.7.15-index/index/mm10.fa.sa
 
-```{code}
-bwa aln /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sai
-
-bwa samse /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/Escherichia_coli_K12_MG1655.fasta /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sai /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/SRX189773_FNR_ChIP.fastq > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/EColi_FNR_ChIP.sam
-```
-
-```{code}
-samtools view -H /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_FNR_ChIP.sam | less -S
-```
 
 Generation of a sge script because of the huge amount of sequences our RAM memory wasn't enough
 
@@ -116,3 +119,7 @@ nano  MMusculus_FNR_ChIP.stats
 ```
 
 ![image insertion test](%5Chomework_02%5CCEBPA%5Cduplication_levels.png)
+
+##possible justification of the E. coli alignment results:
+the highest peak of the Duplicate Sequences graph suggests that there are over-sequence parts of the library, which seems to be justify with the information provided by the overrepresented sequences table where two truSeq Adapters represents almost the 30% of these overrepresentations
+
