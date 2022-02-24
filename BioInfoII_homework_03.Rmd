@@ -1,0 +1,23 @@
+---
+title: "homework_03"
+author: "Esteban Jorquera"
+date: "24-02-2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Using IGV
+• -Load annotations for the genome (which one is the annotation file? What is this format describing?)
+
+The annotation file is "PccAS_v3.gff3", the gff3 (General Feature Format) file format describes the coordinates of an annotation in this case a gene annotation
+
+• What is the browser displaying?
+• What happens if you zoom in or out?
+• Load an alignment file for an RNA-seq experiment
+• MT1 and MT2
+• Is the data in the correct format?
+• What kind of data do you need?
+• Why are there two files per sample?
