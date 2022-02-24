@@ -15,9 +15,151 @@ knitr::opts_chunk$set(echo = TRUE)
 The annotation file is "PccAS_v3.gff3", the gff3 (General Feature Format) file format describes the coordinates of an annotation in this case a gene annotation
 
 • What is the browser displaying?
+
+The gene annotation track loaded from "PccAS_v3.gff3" over the reference genome of Plasmodium chabaudi AS contained in the "PccAS_v3_genome.fa" file and its index "PccAS_v3_genome.fa.fai"
+
 • What happens if you zoom in or out?
-• Load an alignment file for an RNA-seq experiment
-• MT1 and MT2
+If we zoom in we can see the individual genes including introns and exons, if we zoom out gene locations overlap showing the relative abundance of genes across the genome
+
+• Load an alignment file for an RNA-seq experiment MT1 and MT2
+MT1 and MT2 correspond to 2 different samples
+
 • Is the data in the correct format?
+All files are raw sequencing reads in the fastq files, and therefore not alignments, requiring aligning using a program like hisat2
+
 • What kind of data do you need?
+The data needed should be a sam or bam file which contains the reads already aligned to the reference genome 
+
 • Why are there two files per sample?
+There are 2 files per sample because the sequencing was pair-ended
+
+
+```{code fastqc_PccAS_v3.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+#You can edit the scriptsince this line
+#
+# Your job name
+#$ -N Esteban_fastqc_plasmodium
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M eijorquera@uc.cl
+#
+# If modules are needed, source modules environment (Do not delete the next line):
+. /etc/profile.d/modules.sh
+#
+# Add any modules you might require
+(module load fastqc/0.11.3 ; 
+fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_1.fastq -o output ; 
+fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_2.fastq -o output ; 
+fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT2_1.fastq -o output ; 
+fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT2_2.fastq -o output)
+```
+
+
+
+
+```{code hisat2_PccAS_v3.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+#You can edit the scriptsince this line
+#
+# Your job name
+#$ -N Esteban_hisat2_plasmodium
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M eijorquera@uc.cl
+#
+# If modules are needed, source modules environment (Do not delete the next line):
+. /etc/profile.d/modules.sh
+#
+# Add any modules you might require
+(module load  hisat2/2.0.0-beta ; 
+hisat2-build /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_genome.fa /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_hisat2.idx ; 
+hisat2 --max-intronlen 10000 -x /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_hisat2.idx -1 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_1.fastq -2 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_2.fastq -S /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.sam ; 
+hisat2 --max-intronlen 10000 -x /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_hisat2.idx -1 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3 ; /MT2_1.fastq -2 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT2_2.fastq -S /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.sam)
+```
+
+
+```{code samtools_PccAS_v3.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+#You can edit the scriptsince this line
+#
+# Your job name
+#$ -N Esteban_samtools_plasmodium
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M eijorquera@uc.cl
+#
+# If modules are needed, source modules environment (Do not delete the next line):
+. /etc/profile.d/modules.sh
+#
+# Add any modules you might require
+(module load samtools/1.9 ; 
+samtools view -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.sam > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.bam ; 
+samtools view -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.sam > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.bam ; 
+samtools sort /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.bam -o /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1_sort.bam ; 
+samtools sort /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.bam -o /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2_sort.bam ;
+samtools index -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1_sort.bam ;
+samtools index -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2_sort.bam)
+```
+
+
+```{code}
+#
+scp ejorquera@dna.lavis.unam.mx:/mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/\{MT1_1_fastqc.html,MT1_2_fastqc.html,MT2_1_fastqc.html,MT2_2_fastqc.html,MT1_1_fastqc.zip,MT1_2_fastqc.zip,MT2_1_fastqc.zip,MT2_2_fastqc.zip\} ./
+#
+scp ejorquera@dna.lavis.unam.mx:/mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/\{MT1_sort.bam,MT1_sort.bam.bai,MT2_sort.bam,MT2_sort.bam.bai\} ./
+```
+
+
+
+Now we can load the BAM files to IGV... Remember you need the
+index
+• What do you see, explore the genome.
+We see the individual reads of both samples aligned to the reference genome and we can see their aligment to the genes thanks to the annotation file
+
+• Visualize loci: PCHAS_0505200 and PCHAS_1409500
+
+• What do you see?
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_03/PCHAS_0505200.png')
+```
+
+At the gene PCHAS_0505200 we can see the alignment to the genome of the reads of both samples, reads align to the described exons in the gene, interestingly it seems that both samples are showing an extra exon or unstranslated region upstream of the annotated 1st exon
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_03/PCHAS_1409500.png')
+```
+At the gene PCHAS_1409500 we see something similar than at PCHAS_0505200, there also seems to be an extra exon upstream or unstranslated region of the annotated 1st exon, however this time the gene is in the opposite strand
+
+• Can you export the figure?
+Yes, the current browser view can be exported as either a png file or as svg file.
