@@ -74,37 +74,37 @@ kable(FNR_DF,align = "c")
 ```
 According to fastqc results the FNR ChIP-seq basic statistics are correct 
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/FNR/per_base_quality.png')
 ```
 
 Similarly per base sequence quality remained consistent until the last base
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/FNR/per_tile_quality.png')
 ```
 
 We see the first mayor issue in the per tile sequence quality, as seen in the lane #26, where sequence quality is lower than the rest of the flowcell, meanwhile this error could be transient (ie. bubbles forming in the flowcell), it seems that this lane might have been damaged since all positions of the reads of this lane have lower qualities.
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/FNR/per_base_sequence_content.png')
 ```
 
 The next issue present is seen in the per base sequence content, here we should see similarly flat lines for every base, however we can see a clear preference of a base at a specific position, this indicates that a specific sequence was overrepressented, in this case the sequence we can read from the image is "GATCGGAAGAGCACACGTCTGAACTCCAGTCACACA".Considering that this is a ChIP-seq experiment, we thought that this sequence could be  the biding motif of the analyzed protein.
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='50%'}
 knitr::include_graphics('./homework_02/FNR/FNR_Motif.png')
 ```
 
 However, the "GATCGGAAGAGCACACGTCTGAACTCCAGTCACACA" sequence does not correspond to the binding motif of E.Coli FNR (Kumka & Bauer, 2015), meaning that the most likely cause of this error is the presence of sequencing adapters.
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/FNR/per_sequence_gc_content.png')
 ```
 
 Guanine and Cytosine content also shows errors, indicating a large fraction of reads with GC content above the expected theoretical curve, at around 53% content, we suspect this is due to the overrepressented "GATCGGAAGAGCACACGTCTGAACTCCAGTCACACA" sequence.
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/FNR/duplication_levels.png')
 ```
 
@@ -123,7 +123,7 @@ kable(FNR_sequences,align = "c")
 
 When we analyze the overrepresented sequences, we can confirm that they correspond to adapters, specifically Illumina TruSeq adapters.
 
-```{r echo=FALSE, out.width='100%'}
+```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/FNR/kmer_profiles.png')
 ```
 
@@ -203,4 +203,24 @@ CEBPA_table <- matrix(c('mus_musculus_CEBPA_liver_ERR005132.fastq.gz','Conventio
 colnames(CEBPA_table) <- c('Filename','File type','Encoding','Total Sequences','Sequences flagged as poor quality','Sequence length','%GC')
 CEBPA_DF <- as.data.frame(CEBPA_table)
 kable(CEBPA_DF,align = "c")
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_02/CEBPA/per_base_quality.png')
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_02/CEBPA/per_tile_quality.png')
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_02/CEBPA/per_sequence_quality.png')
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_02/CEBPA/per_base_sequence_content.png')
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_02/CEBPA/kmer_profiles.png')
 ```
