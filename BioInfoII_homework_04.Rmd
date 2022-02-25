@@ -1,0 +1,47 @@
+---
+title: "homework_04"
+author: "Esteban Jorquera; Marlon Aldair; Diego Ramírez"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+  css: readable.min.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+#### deeptools bam to bigwig conversion of the M. musculus CEBPA ChIP-seq alignment
+
+```{code deeptools_H3K36me3.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+# You can edit the script since this line
+#
+# Your job name
+#$ -N Esteban_deeptools_CEBPA
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M eijorquera@uc.cl
+#
+# Line required if modules are to be used, source modules environment
+. /etc/profile.d/modules.sh
+#
+# Loads deeptools module,
+# executes bamCoverage for bam to bw conversion of the mus musculus ChIP-seq alignment data
+(module load deeptools/2.5.3 ; 
+computeMatrix reference-point -S /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_4/H3K36me3.bw -R /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_4/Human38_genesGencodev32.bed --referencePoint center -a 2000 -b 2000 -out /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_4/matrix_H3K36me3_matrix.tab.gz ; 
+plotHeatmap -m /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_4/matrix_H3K36me3_matrix.tab.gz -out /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_4/output/H3K36me3_genes.png --heatmapHeight 15 --refPointLabel gene.center --regionsLabel genes --plotTitle ' H3K36me3 signal')
+```
