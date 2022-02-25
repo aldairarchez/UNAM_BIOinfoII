@@ -2,7 +2,9 @@
 title: "homework_03"
 author: "Esteban Jorquera"
 date: "24-02-2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Using IGV
+
+### RNA-seq P. chabaudi AS
+
 • -Load annotations for the genome (which one is the annotation file? What is this format describing?)
 
 The annotation file is "PccAS_v3.gff3", the gff3 (General Feature Format) file format describes the coordinates of an annotation in this case a gene annotation
@@ -33,6 +38,7 @@ The data needed should be a sam or bam file which contains the reads already ali
 • Why are there two files per sample?
 There are 2 files per sample because the sequencing was pair-ended
 
+#### fastqc analysis of the P. chabaudi RNA-seq reads
 
 ```{code fastqc_PccAS_v3.sge}
 #!/bin/bash
@@ -54,10 +60,11 @@ There are 2 files per sample because the sequencing was pair-ended
 #$ -m e
 #$ -M eijorquera@uc.cl
 #
-# If modules are needed, source modules environment (Do not delete the next line):
+# Line required if modules are to be used, source modules environment
 . /etc/profile.d/modules.sh
 #
-# Add any modules you might require
+# Loads fastqc module,
+# executes fastqc to analyze the 2 pair-ended samples of plasmodium chabaudi RNA-seq
 (module load fastqc/0.11.3 ; 
 fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_1.fastq -o output ; 
 fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_2.fastq -o output ; 
@@ -66,6 +73,7 @@ fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT2_2.fastq -o output)
 ```
 
 
+#### hisat2 alignment of the P. chabaudi RNA-seq reads
 
 
 ```{code hisat2_PccAS_v3.sge}
@@ -88,16 +96,21 @@ fastqc /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT2_2.fastq -o output)
 #$ -m e
 #$ -M eijorquera@uc.cl
 #
-# If modules are needed, source modules environment (Do not delete the next line):
+# Line required if modules are to be used, source modules environment
 . /etc/profile.d/modules.sh
 #
-# Add any modules you might require
+# Loads hisat2 module,
+# executes hisat2-build to index the plasmodium chabaudi genome
+# executes hisat2 to align the 2 pair-ended samples of plasmodium chabaudi RNA-seq
+
 (module load  hisat2/2.0.0-beta ; 
 hisat2-build /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_genome.fa /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_hisat2.idx ; 
 hisat2 --max-intronlen 10000 -x /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_hisat2.idx -1 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_1.fastq -2 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT1_2.fastq -S /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.sam ; 
 hisat2 --max-intronlen 10000 -x /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/PccAS_v3_hisat2.idx -1 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3 ; /MT2_1.fastq -2 /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/MT2_2.fastq -S /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.sam)
 ```
 
+
+#### samtools sam to bam conversion, sorting and indexing of the P. chabaudi RNA-seq alignments
 
 ```{code samtools_PccAS_v3.sge}
 #!/bin/bash
@@ -110,7 +123,7 @@ hisat2 --max-intronlen 10000 -x /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_
 # Run job through bash shell
 #$ -S /bin/bash
 #
-#You can edit the scriptsince this line
+# You can edit the script since this line
 #
 # Your job name
 #$ -N Esteban_samtools_plasmodium
@@ -119,10 +132,13 @@ hisat2 --max-intronlen 10000 -x /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_
 #$ -m e
 #$ -M eijorquera@uc.cl
 #
-# If modules are needed, source modules environment (Do not delete the next line):
+# Line required if modules are to be used, source modules environment
 . /etc/profile.d/modules.sh
 #
-# Add any modules you might require
+# Loads samtools module,
+# executes samtools view for sam to bam conversion of the plasmodium chabaudi AS RNA-seq alignment data
+# executes samtools sort to sort the generated bam file
+# executes samtools index to index the sorted bam file 
 (module load samtools/1.9 ; 
 samtools view -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.sam > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT1.bam ; 
 samtools view -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.sam > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MT2.bam ; 
@@ -163,3 +179,83 @@ At the gene PCHAS_1409500 we see something similar than at PCHAS_0505200, there 
 
 • Can you export the figure?
 Yes, the current browser view can be exported as either a png file or as svg file.
+
+
+### CEBPA M. musculus
+
+• Using IGV try to visualize the data for mouse ChIP-seq you generated. Is a liver data set, can you point to an interesting loci?
+
+#### samtools sam to bam conversion, sorting and indexing of the M. musculus CEBPA ChIP-seq alignment
+
+```{code samtools_MMusculus_CEBPA.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+# You can edit the script since this line
+#
+# Your job name
+#$ -N Esteban_samtools_CEBPA
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M eijorquera@uc.cl
+#
+# Line required if modules are to be used, source modules environment
+. /etc/profile.d/modules.sh
+#
+# Loads samtools module,
+# executes samtools view for sam to bam conversion of the mus musculus ChIP-seq alignment data
+# executes samtools sort to sort the generated bam file
+# executes samtools index to index the sorted bam file 
+(module load samtools/1.9 ; 
+samtools view -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_2/output/MMusculus_CEBPA_ChIP.sam > /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MMusculus_CEBPA_ChIP.bam ; 
+samtools sort /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MMusculus_CEBPA_ChIP.bam -o /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MMusculus_CEBPA_ChIP_sort.bam ;
+samtools index -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MMusculus_CEBPA_ChIP_sort.bam)
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_03/IGV_CEBPA_ChIP_Fabp2.png')
+```
+
+
+#### deeptools bam to bigwig conversion of the M. musculus CEBPA ChIP-seq alignment
+
+```{code deeptools_MMusculus_CEBPA.sge}
+#!/bin/bash
+# Use current working directory
+#$ -cwd
+#
+# Join stdout and stderr
+#$ -j y
+#
+# Run job through bash shell
+#$ -S /bin/bash
+#
+# You can edit the script since this line
+#
+# Your job name
+#$ -N Esteban_deeptools_CEBPA
+
+# Send an email after the job has finished
+#$ -m e
+#$ -M eijorquera@uc.cl
+#
+# Line required if modules are to be used, source modules environment
+. /etc/profile.d/modules.sh
+#
+# Loads deeptools module,
+# executes bamCoverage for bam to bw conversion of the mus musculus ChIP-seq alignment data
+(module load deeptools/2.5.3 ; 
+bamCoverage -b /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MMusculus_CEBPA_ChIP_sort.bam -o /mnt/Citosina/amedina/ejorquera/BioInfoII/Tarea_3/output/MMusculus_CEBPA_ChIP_sort.bw)
+```
+
+```{r echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics('./homework_03/UCSC_CEBPA_ChIP_Fabp2.png')
+```
