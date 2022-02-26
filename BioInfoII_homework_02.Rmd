@@ -223,4 +223,6 @@ knitr::include_graphics('./homework_02/CEBPA/per_base_sequence_content.png')
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/kmer_profiles.png')
+
+tarea_02
 ```
