@@ -90,7 +90,7 @@ We see the first mayor issue in the per tile sequence quality, as seen in the la
 knitr::include_graphics('./homework_02/FNR/per_base_sequence_content.png')
 ```
 
-The next issue present is seen in the per base sequence content, here we should see similarly flat lines for every base, however we can see a clear preference of a base at a specific position, this indicates that a specific sequence was overrepressented, in this case the sequence we can read from the image is "GATCGGAAGAGCACACGTCTGAACTCCAGTCACACA".Considering that this is a ChIP-seq experiment, we thought that this sequence could be  the biding motif of the analyzed protein.
+The next issue present is seen in the per base sequence content, here we should see similarly flat lines for every base, however we can see a clear preference of a base at a specific position, this indicates that a specific sequence was overrepressented, in this case the sequence we can read from the image is "GATCGGAAGAGCACACGTCTGAACTCCAGTCACACA".Considering that this is a ChIP-seq experiment, we thought that this sequence could be the biding motif of the analyzed protein.
 
 ```{r echo=FALSE, fig.align='center', out.width='50%'}
 knitr::include_graphics('./homework_02/FNR/FNR_Motif.png')
@@ -208,21 +208,27 @@ kable(CEBPA_DF,align = "c")
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_base_quality.png')
 ```
+per base sequence quality seems to be reduced from a 28 median quality score to 8 in the total sequence lenght (42)
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_tile_quality.png')
 ```
+Per tile sequence quality shows that there is not a single lane which does not have qualities lower than the rest of the flow cell, indicating deviation in scores that persisted for several cycles
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_sequence_quality.png')
 ```
+Mean sequence quality of 15, which is above to a 1% error rate (20)
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_base_sequence_content.png')
 ```
+the error in this graph is not due to the presence of adapters in the illumina sequencer, because there are not overrepresented sequences or abnormal levels of gc content
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/kmer_profiles.png')
+
+flowcells generating problems in the sequencing, contributing to the low quality sequence
 
 tarea_02
 ```
