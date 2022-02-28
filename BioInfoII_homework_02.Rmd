@@ -208,27 +208,25 @@ kable(CEBPA_DF,align = "c")
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_base_quality.png')
 ```
-per base sequence quality seems to be reduced from a 28 median quality score to 8 in the total sequence lenght (42)
+Per base sequence quality seems to be reduced from a 28 median quality score to 8 in the total sequence lenght (42)
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_tile_quality.png')
 ```
-Per tile sequence quality shows that there is not a single lane which does not have qualities lower than the rest of the flow cell, indicating deviation in scores that persisted for several cycles
+Per tile sequence quality shows that there is not a single read which does not have qualities lower than the rest of the flow cell, indicating deviation in scores that persisted for several cycles, these can be due to bubbles forming in the flowcell (at least for blue squares) but other colors could stand for important sequence errors. 
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_sequence_quality.png')
 ```
-Mean sequence quality of 15, which is above to a 1% error rate (20)
+As we can see in the graph the mean sequence quality has its higher point around 15 with a like-normal distribution, which shows a low sequence quality (above 1% error rate) meaning that the base call accuracy rounds beetween 90-99%.
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/per_base_sequence_content.png')
 ```
-the error in this graph is not due to the presence of adapters in the illumina sequencer, because there are not overrepresented sequences or abnormal levels of gc content
+The error in this graph is not due to the presence of adapters in the illumina sequencer, because there are not overrepresented sequences or abnormal levels of gc content.
 
 ```{r echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics('./homework_02/CEBPA/kmer_profiles.png')
-
-flowcells generating problems in the sequencing, contributing to the low quality sequence
-
-tarea_02
 ```
+
+This suggests that flowcells are generating problems in the sequencing, contributing to the low quality sequence and mapped quality obtained from the sam file using samtools stats which is Q0 (multi-mapped reads).
