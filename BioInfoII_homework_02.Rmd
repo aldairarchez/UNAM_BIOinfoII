@@ -230,5 +230,3 @@ knitr::include_graphics('./homework_02/CEBPA/kmer_profiles.png')
 ```
 
 This suggests that flowcells are generating problems in the sequencing, contributing to the low quality sequence and mapped quality obtained from the sam file using samtools stats which is Q0 (multi-mapped reads).
-
-
